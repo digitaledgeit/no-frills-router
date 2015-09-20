@@ -1,0 +1,17 @@
+{
+  "name": "lurhmann",
+  "version": "0.0.1",
+  "description": "A simple router used in a few of my isomorphic experiments.",
+  "keywords": ["router"],
+  "dependencies": {
+    "extend": "^3.0.0",
+    "path-to-regexp": "^1.2.1",
+    "query-string": "^2.4.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "scripts": {
+  }
+}
