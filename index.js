@@ -6,33 +6,47 @@ var toRegExp    = require('path-to-regexp');
 /**
  * Router
  * @constructor
- * @returns {Router}
+ * @returns {NoFrillsRouter}
  */
-function Router() {
+function NoFrillsRouter() {
 
-  if (!(this instanceof Router)) {
-    return new Router()
+  if (!(this instanceof NoFrillsRouter)) {
+    return new NoFrillsRouter()
   }
 
   /**
    * The routes
    * @private
-   * @type {Array.<{name: string, regexp: RegExp, keys: [], handler: *, context: {}}>}
+   * @type {Array.<{name: string|null, regexp: RegExp, keys: [], handler: *, context: {}}>}
    */
   this._routes = [];
 }
 
-Router.prototype = {
+NoFrillsRouter.prototype = {
 
   /**
    * Map a URL pattern to a handler
+   * @param   {string}          [name]
    * @param   {string|RegExp}   pattern
    * @param   {*}               handler
-   * @param   {Object}          [options]
-   * @returns {Router}
+   * @param   {Object}          [context]
+   * @returns {NoFrillsRouter}
    */
-  map: function(pattern, handler, options) {
-    options = options || {};
+  map: function(name, pattern, handler, context) {
+    context = context || {};
+
+    if (arguments.length === 2) {
+      handler = pattern;
+      pattern = name;
+      name    = null;
+    } else if (arguments.length === 3) {
+      if (typeof handler === 'object') {
+        context = handler;
+        handler = pattern;
+        pattern = name;
+        name    = null;
+      }
+    }
 
     var keys = [];
     var regexp = pattern;
@@ -48,10 +62,10 @@ Router.prototype = {
 
     //add the route
     this._routes.push({
-      name:     options.name || null,
+      name:     name,
       pattern:  pattern,
       handler:  handler,
-      options:  options,
+      context:  context,
       regexp:   regexp,
       keys:     keys
     });
@@ -60,11 +74,11 @@ Router.prototype = {
   },
 
   /**
-   * Route a URL to the first matching handler
+   * Match a URL to a handler
    * @param   {string} url A URL
    * @returns {{params: {}, name: string, handler: *}|null}
    */
-  route: function(url) {
+  match: function(url) {
 
     var parsedUrl = parseUrl(url);
     var pathname = parsedUrl.pathname;
@@ -87,7 +101,7 @@ Router.prototype = {
         }
 
         //return the route data
-        return extend({}, route.options, {
+        return extend({}, route.context, {
           name:     route.name,
           params:   params,
           handler:  route.handler
@@ -101,9 +115,9 @@ Router.prototype = {
   },
 
   /**
-   * Assemble a URL for named route
+   * Assemble a URL for a handler
    * @param   {string}  name
-   * @param   {{}}      [params]
+   * @param   {Object}  [params]
    * @returns {string|null}
    */
   assemble: function(name, params) {
@@ -121,4 +135,10 @@ Router.prototype = {
 
 };
 
-module.exports = Router;
+Object.defineProperty(NoFrillsRouter.prototype, 'routes', {
+  get: function() {
+    return this._routes;
+  }
+});
+
+module.exports = NoFrillsRouter;

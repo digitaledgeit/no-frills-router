@@ -1,21 +1,18 @@
-var router = require('..');
+var nfr = require('..');
+var http = require('http');
 
-function home() {}
-function profile() {}
-function notfound() {}
+var router = nfr()
+  .map('home', '/', require('./lib/home'))
+  .map('profile', '/user/:username', require('./lib/profile'))
+  .map('*', require('./lib/not-found'), {status: 404})
+;
 
-var r = router()
-    .map('/',         home)
-    .map('/user/:id', profile,  {name: 'profile'})
-    .map('*',         notfound, {status: 404})
-  ;
+http.createServer(function(req, res) {
 
-//route a URL to a handler
-var route = r.route('/user/123');
-console.log(route.params);                      //prints: {id: 123}
-route.handler(route.params);                    //do something with the handler
-if (route.status) res.status = route.status;    //do something with the custom route data e.g. change the status on the server
+  //match a URL to a handler
+  var match = router.match(req.url);
 
-//assemble a URL for a handler
-var url = r.assemble('profile', route.params);
-console.log(url);                               //prints: /user/123
+  res.status = match.status || 200;
+  res.end(match.handler(match, router));
+
+}).listen(3001);

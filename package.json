@@ -1,8 +1,10 @@
 {
-  "name": "lurhmann",
-  "version": "0.0.1",
+  "name": "no-frills-router",
+  "version": "1.0.0",
   "description": "A simple router used in a few of my isomorphic experiments.",
-  "keywords": ["router"],
+  "keywords": [
+    "router"
+  ],
   "dependencies": {
     "extend": "^3.0.0",
     "path-to-regexp": "^1.2.1",
@@ -10,8 +12,12 @@
   },
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "git@github.com:digitaledgeit/no-frills-router.git"
   },
   "scripts": {
+    "test": "mocha"
+  },
+  "devDependencies": {
+    "mocha": "^2.3.3"
   }
 }
